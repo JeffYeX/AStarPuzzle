@@ -391,22 +391,7 @@ namespace Puzzle
                     levelCountExpanded[currentState.GetParent().level]++;
                 }
 
-                /*
-                if (currentState.mCostf > levelCountExpanded.Length - 1)
-                {
-                    Array.Resize(ref levelCountGenerated, currentState.mCostf + 1);
-                    Array.Resize(ref levelCountExpanded, currentState.mCostf + 1);
-                    Array.Resize(ref levelCountEvaluated, currentState.mCostf + 1);
-                }
-                levelCountExpanded[currentState.mCostf]++;
-                if (currentState.GetParent() != null)
-                {
-                    levelCountEvaluated[currentState.GetParent().mCostf]++;
-                }
-                */
-
                 // Is this final state 
-
                 if (currentState.IsFinalState())
                 {
                     EndMeasure(stateCount);
@@ -427,7 +412,13 @@ namespace Puzzle
                         closedState = null;
                         openState = null;
                         nextState = nextStates[i];
-                        //Console.WriteLine(nextState);
+
+                        if (currentState.level > levelCountGenerated.Length - 1)
+                        {
+                            Array.Resize(ref levelCountGenerated, currentState.level + 1);
+                            Array.Resize(ref levelCountExpanded, currentState.level + 1);
+                            Array.Resize(ref levelCountEvaluated, currentState.level + 1);
+                        }
 
                         nextState.level = currentState.level + 1;
                         levelCountGenerated[currentState.level]++;
@@ -473,12 +464,6 @@ namespace Puzzle
                 }
             }
 
-            //if (currentState != null && !currentState.IsFinalState())
-            //{
-            // No solution
-            //    currentState = null;
-            //}
-
             var steps = PuzzleSolved(currentState, stateCount);
             var goalState = "1*2*3*4*5*6*7*8*-1";
 
@@ -488,17 +473,10 @@ namespace Puzzle
             var totalGenerated = levelCountGenerated.Sum();
             var totalEvaluated = levelCountEvaluated.Sum();
             var totalExpanded = levelCountExpanded.Sum();
-            /*
-            foreach (var item in levelCountExpanded)
-            {
-                levelCountExpandedString += item + "|";
-            }
-            */
+
             var record = new { Time = mStopWatch.ElapsedTicks / 10000.0, State = "\"" + state.GetStateCode() + "\"", GoalState = goalState, Step = steps };
             csv.WriteRecord(record);
-            //csv.WriteRecord(levelCountGenerated);
-            //csv.WriteRecord(levelCountEvaluated);
-            //csv.WriteRecord(levelCountExpanded);
+
             csv.WriteField(levelCountGeneratedString);
             csv.WriteField(levelCountEvaluatedString);
             csv.WriteField(levelCountExpandedString);
